@@ -1,0 +1,830 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 14.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     29956,        822]
+NotebookOptionsPosition[     25252,        737]
+NotebookOutlinePosition[     25653,        753]
+CellTagsIndexPosition[     25610,        750]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+The local polygon of the partially entangled Tsirelson points\
+\>", "Title",ExpressionUUID->"c819da5b-8122-424c-a549-13d2f5bdc4ae"],
+
+Cell["\<\
+For \[Theta] \[Element] (\[Pi]/8, \[Pi]/4], the Bell expressions maximized by \
+the partially entangled Tsirelson point P\[Theta] lie in the plane \[Beta]\
+\[Theta](r0, r1) = \[Beta]0 + r0 \[Beta]1 + r1 \[Beta]2. The local polygon is \
+the set of (r0, r1) where no deterministic point exceeds the local bound, \
+\[Beta]\[Theta](r0, r1).D \[LessEqual] 1. Here we prove exactly that its \
+vertices are the ones listed in the paper: a hexagon below \[Theta]bar, an \
+octagon above, three active constraints at \[Theta]bar, and a segment in the \
+limit \[Theta] \[Rule] \[Pi]/8.\
+\>", "Text",ExpressionUUID->"8a9bff67-6245-4a91-8303-d1363e6c6563"],
+
+Cell[CellGroupData[{
+
+Cell["Preliminaries", "Section",ExpressionUUID->"bb3c9ca5-d1e0-4f30-ac9d-1d7a25ad5575"],
+
+Cell["ClearAll[\"Global`*\"]", "Input",
+ CellLabel->"In[1]:=",ExpressionUUID->"877c9e64-36e9-44ab-be2b-c679709ca6e5"],
+
+Cell["\<\
+One parametrizes \[Theta] with v, defined by tan \[Theta] = (\[Sqrt]2 - 1) + \
+(2 - \[Sqrt]2) v. This maps \[Theta] \[Element] (\[Pi]/8, \[Pi]/4] onto v \
+\[Element] (0, 1] (v is called \[Xi] in the paper). Then cos 2\[Theta] and \
+sin 2\[Theta] are rational functions of v with coefficients in Q(\[Sqrt]2), \
+and so is everything below.\
+\>", "Text",ExpressionUUID->"9cf2621d-9afc-41ca-85aa-37026c5e40ee"],
+
+Cell["\<\
+t = (Sqrt[2] - 1) + (2 - Sqrt[2]) v;
+c = (1 - t^2)/(1 + t^2); (*cos 2\[Theta]*)
+s = 2 t/(1 + t^2); (*sin 2\[Theta]*)
+\[Kappa] = 1 + s^2;\
+\>", "Input",
+ CellLabel->"In[2]:=",ExpressionUUID->"5cf901cf-beeb-441f-927b-cd5142bd01c6"],
+
+Cell["\<\
+The basis of the plane, with the correlations in the order (A0, A1, B0, B1, \
+A0B0, A0B1, A1B0, A1B1):\
+\>", "Text",ExpressionUUID->"ba5307e0-17ac-4a75-92f5-839bac671a5a"],
+
+Cell["\<\
+\[Beta]0 = {0, 0, c/\[Kappa], 0, s^2/(Sqrt[2] \[Kappa]), s/(Sqrt[2] \
+\[Kappa]), s^2/(Sqrt[2] \[Kappa]), -s/(Sqrt[2] \[Kappa])};
+\[Beta]1 = {1/Sqrt[2], 1/Sqrt[2], -2 s^2/\[Kappa], 0, -c/(Sqrt[2] \[Kappa]), \
+s c/(Sqrt[2] \[Kappa]), -c/(Sqrt[2] \[Kappa]), -s c/(Sqrt[2] \[Kappa])};
+\[Beta]2 = {s/Sqrt[2], -s/Sqrt[2], 0, -1, 0, c/Sqrt[2], 0, c/Sqrt[2]};\
+\>", "Input",
+ CellLabel->"In[6]:=",ExpressionUUID->"a5df4b8a-3929-41a7-833e-ea83b38fe7a4"],
+
+Cell[CellGroupData[{
+
+Cell["Deterministic points and their lines", "Subsection",ExpressionUUID->"19477219-f204-4eca-985f-a8cf3b916399"],
+
+Cell["\<\
+A deterministic point is fixed by its outputs (A0, A1, B0, B1) \[Element] {\
+\[PlusMinus]1}^4. The two families of the paper are I(\[Epsilon], \
+\[Epsilon]'): A0 = A1 = B0 = \[Epsilon], B1 = \[Epsilon]', and II(\[Epsilon], \
+\[Epsilon]'): A0 = -A1 = B1 = \[Epsilon], B0 = \[Epsilon]'.\
+\>", "Text",ExpressionUUID->"3ce7929c-4097-451c-8fa4-e8ff3cdafaa3"],
+
+Cell["\<\
+corr[{a0_, a1_, b0_, b1_}] := {a0, a1, b0, b1, a0 b0, a0 b1, a1 b0, a1 b1};
+detI[e_, f_] := {e, e, e, f};
+detII[e_, f_] := {e, -e, f, e};
+allDet = Tuples[{1, -1}, 4];\
+\>", "Input",
+ CellLabel->"In[9]:=",ExpressionUUID->"c0388270-d5df-408d-963f-e26c8de30f19"],
+
+Cell["\<\
+The constraint \[Beta]\[Theta](r0, r1).D \[LessEqual] 1 of a deterministic \
+point D is a half-plane g0 r0 + g1 r1 \[LessEqual] h. We store it as {g0, g1, \
+h}.\
+\>", "Text",ExpressionUUID->"9f3c8e6b-de80-4db4-acd5-2ef72b1db95e"],
+
+Cell["line[p_] := {\[Beta]1.corr[p], \[Beta]2.corr[p], 1 - \
+\[Beta]0.corr[p]};", "Input",
+ CellLabel->"In[13]:=",ExpressionUUID->"402811d3-aab1-4bd8-a681-313be8c77738"],
+
+Cell["\<\
+The lines of two deterministic points meet at a point V, which we get from \
+Cramer's rule. We keep the determinant of the 2\[Times]2 system as a third \
+entry. The slack h - g.V of a constraint at V vanishes when the constraint is \
+active and is positive when it is strict.\
+\>", "Text",ExpressionUUID->"657477ab-2364-4270-95df-1802a7774e62"],
+
+Cell["\<\
+vertex[p1_, p2_] := Module[{l1 = line[p1], l2 = line[p2], d},
+   d = l1[[1]] l2[[2]] - l1[[2]] l2[[1]];
+   {(l1[[3]] l2[[2]] - l2[[3]] l1[[2]])/d, (l1[[1]] l2[[3]] - l2[[1]] \
+l1[[3]])/d, d}];
+slack[p_, V_] := line[p][[3]] - line[p][[1]] V[[1]] - line[p][[2]] V[[2]];\
+\>", "Input",
+ CellLabel->"In[14]:=",ExpressionUUID->"d33fa102-0355-496a-8e08-6bf2b9ecf9ca"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["The transition at \[Theta]bar", "Subsection",
+ CellChangeTimes->{{4.0027949783691397`*^9, 
+  4.00279497877369*^9}},ExpressionUUID->"875e3b5d-3c78-4761-a849-\
+1367048208ac"],
+
+Cell["\<\
+At \[Theta]bar the lines of I(+,+), II(-,+) and I(-,+) meet. In terms of s = \
+sin 2\[Theta], \[Theta]bar is the root of 2 s^3 - \[Sqrt]2 s + 1 - \[Sqrt]2 \
+in (1/\[Sqrt]2, 1). In terms of v it is a root of the rational polynomial \
+below. We pick the right root numerically and check exactly that it solves \
+the equation in s.\
+\>", "Text",ExpressionUUID->"a80d273b-2535-4f67-ab98-884e90700007"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+vbar = First@Select[Table[Root[#^6 + 4 #^5 - 10 #^4 + 4 #^3 + 8 #^2 - 8 # + 2 \
+&, k], {k, 6}],
+    Element[#, Reals] && Abs[N[#] - 0.5759953] < 10^-6 &];
+{RootReduce[(2 s^3 - Sqrt[2] s + 1 - Sqrt[2]) /. v -> vbar], N[vbar, 10], \
+N[ArcTan[t /. v -> vbar], 10]}\
+\>", "Input",
+ CellLabel->"In[16]:=",ExpressionUUID->"9f24f839-305f-440a-b746-7f7b1fb3af39"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "0", ",", "0.57599531058064693052500663401897161845`10.", ",", 
+   "0.6445395332517547944927924363082021635`10."}], "}"}]], "Output",
+ CellChangeTimes->{4.002794971931353*^9},
+ CellLabel->"Out[17]=",ExpressionUUID->"ba16f427-3c3e-4be2-89f3-4e1c6f719cf7"]
+}, Open  ]],
+
+Cell["\<\
+The first entry is 0: vbar is the transition, and the last entry is \
+\[Theta]bar \[TildeEqual] 0.6445.\
+\>", "Text",ExpressionUUID->"7bcd1330-4cea-49fe-9952-3342e60a72b2"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["The vertex table", "Section",ExpressionUUID->"dd28a654-2847-42ca-ab2b-0b9b4812218a"],
+
+Cell["\<\
+A listed point V is a vertex of the polygon on a whole interval of v if (a) \
+its two lines are never parallel there and (b) the other fourteen constraints \
+are strict there. Both are statements about rational functions of v with \
+coefficients in Q(\[Sqrt]2), which Resolve decides exactly. Two consecutive \
+vertices of the list lie on a common line by construction (condition (c) of \
+the proof), so the list contains all the vertices.\
+\>", "Text",ExpressionUUID->"3c02aa8e-2de3-4384-9c3d-edc29f8a2c8f"],
+
+Cell["\<\
+positiveOn[f_, lo_, hi_] := Resolve[ForAll[v, lo < v < hi, Together[f, \
+Extension -> Sqrt[2]] > 0], Reals];
+nonzeroOn[f_, lo_, hi_] := Resolve[ForAll[v, lo < v < hi, Together[f, \
+Extension -> Sqrt[2]] != 0], Reals];
+check[pair_, lo_, hi_] := Module[{V = vertex @@ pair},
+   {nonzeroOn[V[[3]], lo, hi], AllTrue[Complement[allDet, pair], \
+positiveOn[slack[#, V], lo, hi] &]}];\
+\>", "Input",
+ CellLabel->"In[18]:=",ExpressionUUID->"b288c775-f8b5-4f7d-ba5b-54a8bcd6b0c3"],
+
+Cell[CellGroupData[{
+
+Cell["Hexagon, \[Pi]/8 < \[Theta] < \[Theta]bar", "Subsection",ExpressionUUID->"5f77547f-00a9-49d1-b824-64d0e2900e08"],
+
+Cell["\<\
+The six vertices of the paper as pairs of lines. V2' and V3' are the mirror \
+images of V2 and V3.\
+\>", "Text",ExpressionUUID->"087cf1f1-18f9-4a50-bcec-86f94b714076"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+hexagon = <|\"V1\" -> {detII[1, 1], detII[-1, 1]}, \"V2\" -> {detI[1, 1], \
+detII[-1, 1]},
+   \"V3\" -> {detI[1, 1], detII[-1, -1]}, \"V4\" -> {detII[1, -1], detII[-1, \
+-1]},
+   \"V3'\" -> {detI[1, -1], detII[1, -1]}, \"V2'\" -> {detI[1, -1], detII[1, \
+1]}|>;
+hexCheck = check[#, 0, vbar] & /@ hexagon;
+TableForm[Values[hexCheck], TableHeadings -> {Keys[hexagon], {\"lines not \
+parallel\", \"other constraints strict\"}}]\
+\>", "Input",
+ CellLabel->"In[21]:=",ExpressionUUID->"f7ef8128-f515-4ce0-8e3c-782e3531362b"],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {
+      StyleBox["\[Null]",
+       ShowStringCharacters->False], 
+      TagBox["\<\"lines not parallel\"\>",
+       HoldForm], 
+      TagBox["\<\"other constraints strict\"\>",
+       HoldForm]},
+     {
+      TagBox["\<\"V1\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V2\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V3\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V4\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V3'\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V2'\"\>",
+       HoldForm], "True", "True"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+    GridBoxDividers->{
+     "Columns" -> {False, True, {False}, False}, 
+      "Rows" -> {False, True, {False}, False}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[2.0999999999999996`]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}],
+   {OutputFormsDump`HeadedRows, OutputFormsDump`HeadedColumns}],
+  Function[BoxForm`e$, 
+   TableForm[
+   BoxForm`e$, 
+    TableHeadings -> {{"V1", "V2", "V3", "V4", "V3'", "V2'"}, {
+      "lines not parallel", "other constraints strict"}}]]]], "Output",
+ CellChangeTimes->{4.002794994214148*^9},
+ CellLabel->
+  "Out[23]//TableForm=",ExpressionUUID->"69c62f4a-c1c2-4c65-9398-\
+0b8bb4e08ec6"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Octagon, \[Theta]bar < \[Theta] \[LessEqual] \[Pi]/4", "Subsection",ExpressionUUID->"a8b09832-953b-4695-b45f-d116278daa82"],
+
+Cell["\<\
+Above \[Theta]bar the vertex V2 splits into V5 and V6, and V2' into V5' and \
+V6'.\
+\>", "Text",ExpressionUUID->"d3bfc867-d0dd-4404-900b-93615361e355"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+octagon = <|\"V1\" -> {detII[1, 1], detII[-1, 1]}, \"V5\" -> {detII[-1, 1], \
+detI[-1, 1]},
+   \"V6\" -> {detI[1, 1], detI[-1, 1]}, \"V3\" -> {detI[1, 1], detII[-1, \
+-1]},
+   \"V4\" -> {detII[1, -1], detII[-1, -1]}, \"V3'\" -> {detI[1, -1], detII[1, \
+-1]},
+   \"V6'\" -> {detI[1, -1], detI[-1, -1]}, \"V5'\" -> {detII[1, 1], detI[-1, \
+-1]}|>;
+octCheck = check[#, vbar, 1] & /@ octagon;
+TableForm[Values[octCheck], TableHeadings -> {Keys[octagon], {\"lines not \
+parallel\", \"other constraints strict\"}}]\
+\>", "Input",
+ CellLabel->"In[24]:=",ExpressionUUID->"c7a73675-4a03-46b0-abee-07da4d49f61f"],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {
+      StyleBox["\[Null]",
+       ShowStringCharacters->False], 
+      TagBox["\<\"lines not parallel\"\>",
+       HoldForm], 
+      TagBox["\<\"other constraints strict\"\>",
+       HoldForm]},
+     {
+      TagBox["\<\"V1\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V5\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V6\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V3\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V4\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V3'\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V6'\"\>",
+       HoldForm], "True", "True"},
+     {
+      TagBox["\<\"V5'\"\>",
+       HoldForm], "True", "True"}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+    GridBoxDividers->{
+     "Columns" -> {False, True, {False}, False}, 
+      "Rows" -> {False, True, {False}, False}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[2.0999999999999996`]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}],
+   {OutputFormsDump`HeadedRows, OutputFormsDump`HeadedColumns}],
+  Function[BoxForm`e$, 
+   TableForm[
+   BoxForm`e$, 
+    TableHeadings -> {{"V1", "V5", "V6", "V3", "V4", "V3'", "V6'", "V5'"}, {
+      "lines not parallel", "other constraints strict"}}]]]], "Output",
+ CellChangeTimes->{4.002795002668757*^9},
+ CellLabel->
+  "Out[26]//TableForm=",ExpressionUUID->"9737b2a0-3288-4033-884d-\
+1574f4e94686"]
+}, Open  ]],
+
+Cell["\<\
+The interval above is open, so we check the end point \[Theta] = \[Pi]/4 (v = \
+1) separately, with exact numbers:\
+\>", "Text",ExpressionUUID->"6c4e4cd7-7739-4b8d-af68-cc806a0f0289"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+atPiQuarter[pair_] := Module[{V = vertex @@ pair},
+   RootReduce[V[[3]] /. v -> 1] != 0 &&
+    AllTrue[Complement[allDet, pair], RootReduce[slack[#, V] /. v -> 1] > 0 \
+&]];
+piQuarterCheck = atPiQuarter /@ octagon\
+\>", "Input",
+ CellLabel->"In[27]:=",ExpressionUUID->"cce9bf92-501b-47df-9263-17a988ba9696"],
+
+Cell[BoxData[
+ RowBox[{"\[LeftAssociation]", 
+  RowBox[{
+   RowBox[{"\<\"V1\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V5\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V6\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V3\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V4\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V3'\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V6'\"\>", "\[Rule]", "True"}], ",", 
+   RowBox[{"\<\"V5'\"\>", "\[Rule]", "True"}]}], 
+  "\[RightAssociation]"}]], "Output",
+ CellChangeTimes->{4.00279502281275*^9},
+ CellLabel->"Out[28]=",ExpressionUUID->"3f921830-e569-4b46-81d7-5953e8e9a0a9"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["At \[Theta]bar", "Subsection",ExpressionUUID->"b97996c1-bd82-488c-8cce-b2372e8c91ee"],
+
+Cell["\<\
+At \[Theta]bar the vertex V2 = I(+,+) \[Intersection] II(-,+) also lies on \
+the line of I(-,+), and its mirror image V2' on the line of I(-,-). All the \
+other constraints stay strict. This is item (iii) of the proposition.\
+\>", "Text",ExpressionUUID->"1cd8960c-bf97-438e-b6c3-af7f791b03f8"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+atThetaBar[pair_] := Module[{V = vertex @@ pair, sl},
+   sl = AssociationMap[RootReduce[slack[#, V] /. v -> vbar] &, \
+Complement[allDet, pair]];
+   {Keys[Select[sl, # == 0 &]], AllTrue[Values[Select[sl, # != 0 &]], # > 0 \
+&]}];
+barCheck = atThetaBar /@ hexagon;
+TableForm[Values[barCheck], TableHeadings -> {Keys[hexagon], {\"extra active \
+constraints\", \"others strict\"}}]\
+\>", "Input",
+ CellLabel->"In[29]:=",ExpressionUUID->"0655d0b8-4142-4aaf-9dbe-596fd9cffdb5"],
+
+Cell[BoxData[
+ InterpretationBox[GridBox[{
+    {"\<\"\"\>", "\<\"extra active constraints\"\>", "\<\"others \
+strict\"\>"},
+    {"\<\"V1\"\>", "\<\"\"\>", "True"},
+    {"\<\"V2\"\>", GridBox[{
+       {
+        RowBox[{"-", "1"}], 
+        RowBox[{"-", "1"}], 
+        RowBox[{"-", "1"}], "1"}
+      },
+      GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}}], "True"},
+    {"\<\"V3\"\>", "\<\"\"\>", "True"},
+    {"\<\"V4\"\>", "\<\"\"\>", "True"},
+    {"\<\"V3'\"\>", "\<\"\"\>", "True"},
+    {"\<\"V2'\"\>", GridBox[{
+       {
+        RowBox[{"-", "1"}], 
+        RowBox[{"-", "1"}], 
+        RowBox[{"-", "1"}], 
+        RowBox[{"-", "1"}]}
+      },
+      GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+      GridBoxSpacings->{"Columns" -> {
+          Offset[0.27999999999999997`], {
+           Offset[0.7]}, 
+          Offset[0.27999999999999997`]}, "Rows" -> {
+          Offset[0.2], {
+           Offset[0.1]}, 
+          Offset[0.2]}}], "True"}
+   },
+   GridBoxAlignment->{"Columns" -> {{Center}}, "Rows" -> {{Baseline}}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}}],
+  TableForm[{{{}, True}, {{{-1, -1, -1, 1}}, True}, {{}, True}, {{}, 
+     True}, {{}, True}, {{{-1, -1, -1, -1}}, True}}, 
+   TableHeadings -> {{"V1", "V2", "V3", "V4", "V3'", "V2'"}, {
+     "extra active constraints", "others strict"}}]]], "Output",
+ CellChangeTimes->{4.00279502732619*^9},
+ CellLabel->
+  "Out[31]//TableForm=",ExpressionUUID->"cbc46038-0e4e-46e0-9c13-\
+b41ca8e61b5c"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["The limit \[Theta] \[Rule] \[Pi]/8", "Subsection",ExpressionUUID->"4559ce02-1fba-4b28-a516-a271d9b61f1a"],
+
+Cell["\<\
+When v \[Rule] 0 the hexagon collapses onto the segment r0 = 1/\[Sqrt]2, |r1| \
+\[LessEqual] \[Sqrt]2 - 1, item (v) of the proposition. Once simplified with \
+Together, the coordinates of the vertices have denominators that do not \
+vanish at v = 0, so the limit is the value at v = 0:\
+\>", "Text",ExpressionUUID->"d044a666-16de-4901-8221-98d63399808f"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+coords = Together[Most[vertex @@ #], Extension -> Sqrt[2]] & /@ hexagon;
+denominators = Simplify[Denominator[#] /. v -> 0] & /@ coords;
+limits = Simplify[# /. v -> 0] & /@ coords;
+TableForm[Transpose[{Values[denominators], Values[limits]}],
+ TableHeadings -> {Keys[hexagon], {\"denominators at v = 0\", \"(r0, r1) at v \
+= 0\"}}]\
+\>", "Input",
+ CellLabel->"In[32]:=",ExpressionUUID->"2063ed74-2f91-43a7-97dc-9e1f7edbba40"],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {
+      StyleBox["\[Null]",
+       ShowStringCharacters->False], 
+      TagBox["\<\"denominators at v = 0\"\>",
+       HoldForm], 
+      TagBox["\<\"(r0, r1) at v = 0\"\>",
+       HoldForm]},
+     {
+      TagBox["\<\"V1\"\>",
+       HoldForm], 
+      TagBox[GridBox[{
+         {
+          RowBox[{
+           RowBox[{"-", "4"}], "+", 
+           RowBox[{"3", " ", 
+            SqrtBox["2"]}]}]},
+         {"1"}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column], 
+      TagBox[GridBox[{
+         {
+          FractionBox["1", 
+           SqrtBox["2"]]},
+         {"0"}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column]},
+     {
+      TagBox["\<\"V2\"\>",
+       HoldForm], 
+      TagBox[GridBox[{
+         {
+          RowBox[{
+           RowBox[{"-", "10"}], "+", 
+           RowBox[{"7", " ", 
+            SqrtBox["2"]}]}]},
+         {
+          RowBox[{
+           RowBox[{"-", "10"}], "+", 
+           RowBox[{"7", " ", 
+            SqrtBox["2"]}]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column], 
+      TagBox[GridBox[{
+         {
+          FractionBox["1", 
+           SqrtBox["2"]]},
+         {
+          RowBox[{"1", "-", 
+           SqrtBox["2"]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column]},
+     {
+      TagBox["\<\"V3\"\>",
+       HoldForm], 
+      TagBox[GridBox[{
+         {
+          RowBox[{"26", "-", 
+           RowBox[{"18", " ", 
+            SqrtBox["2"]}]}]},
+         {
+          RowBox[{
+           RowBox[{"-", "10"}], "+", 
+           RowBox[{"8", " ", 
+            SqrtBox["2"]}]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column], 
+      TagBox[GridBox[{
+         {
+          FractionBox["1", 
+           SqrtBox["2"]]},
+         {
+          RowBox[{
+           FractionBox["1", "7"], " ", 
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"-", "5"}], "+", 
+             RowBox[{"3", " ", 
+              SqrtBox["2"]}]}], ")"}]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column]},
+     {
+      TagBox["\<\"V4\"\>",
+       HoldForm], 
+      TagBox[GridBox[{
+         {
+          RowBox[{"2", "-", 
+           SqrtBox["2"]}]},
+         {"1"}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column], 
+      TagBox[GridBox[{
+         {
+          FractionBox["1", 
+           SqrtBox["2"]]},
+         {"0"}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column]},
+     {
+      TagBox["\<\"V3'\"\>",
+       HoldForm], 
+      TagBox[GridBox[{
+         {
+          RowBox[{"26", "-", 
+           RowBox[{"18", " ", 
+            SqrtBox["2"]}]}]},
+         {
+          RowBox[{
+           RowBox[{"-", "10"}], "+", 
+           RowBox[{"8", " ", 
+            SqrtBox["2"]}]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column], 
+      TagBox[GridBox[{
+         {
+          FractionBox["1", 
+           SqrtBox["2"]]},
+         {
+          RowBox[{
+           FractionBox["1", "7"], " ", 
+           RowBox[{"(", 
+            RowBox[{"5", "-", 
+             RowBox[{"3", " ", 
+              SqrtBox["2"]}]}], ")"}]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column]},
+     {
+      TagBox["\<\"V2'\"\>",
+       HoldForm], 
+      TagBox[GridBox[{
+         {
+          RowBox[{
+           RowBox[{"-", "10"}], "+", 
+           RowBox[{"7", " ", 
+            SqrtBox["2"]}]}]},
+         {
+          RowBox[{
+           RowBox[{"-", "10"}], "+", 
+           RowBox[{"7", " ", 
+            SqrtBox["2"]}]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column], 
+      TagBox[GridBox[{
+         {
+          FractionBox["1", 
+           SqrtBox["2"]]},
+         {
+          RowBox[{
+           RowBox[{"-", "1"}], "+", 
+           SqrtBox["2"]}]}
+        },
+        GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+        GridBoxSpacings->{"Columns" -> {
+            Offset[0.27999999999999997`], {
+             Offset[0.5599999999999999]}, 
+            Offset[0.27999999999999997`]}, "Rows" -> {{
+             Offset[0.2]}}}],
+       Column]}
+    },
+    GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+    GridBoxDividers->{
+     "Columns" -> {False, True, {False}, False}, 
+      "Rows" -> {False, True, {False}, False}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[2.0999999999999996`]}, 
+        Offset[0.27999999999999997`]}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}}],
+   {OutputFormsDump`HeadedRows, OutputFormsDump`HeadedColumns}],
+  Function[BoxForm`e$, 
+   TableForm[
+   BoxForm`e$, 
+    TableHeadings -> {{"V1", "V2", "V3", "V4", "V3'", "V2'"}, {
+      "denominators at v = 0", "(r0, r1) at v = 0"}}]]]], "Output",
+ CellChangeTimes->{4.002795032174117*^9},
+ CellLabel->
+  "Out[35]//TableForm=",ExpressionUUID->"3b6fc855-9e31-408a-934f-\
+ee58dfde1eee"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{400, Automatic}, {Automatic, 101}},
+FrontEndVersion->"14.0 for Mac OS X ARM (64-bit) (December 12, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"6643adea-6065-4978-9583-dc49e70784d4"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 141, 2, 98, "Title",ExpressionUUID->"c819da5b-8122-424c-a549-13d2f5bdc4ae"],
+Cell[724, 26, 653, 9, 58, "Text",ExpressionUUID->"8a9bff67-6245-4a91-8303-d1363e6c6563"],
+Cell[CellGroupData[{
+Cell[1402, 39, 87, 0, 67, "Section",ExpressionUUID->"bb3c9ca5-d1e0-4f30-ac9d-1d7a25ad5575"],
+Cell[1492, 41, 117, 1, 30, "Input",ExpressionUUID->"877c9e64-36e9-44ab-be2b-c679709ca6e5"],
+Cell[1612, 44, 416, 6, 40, "Text",ExpressionUUID->"9cf2621d-9afc-41ca-85aa-37026c5e40ee"],
+Cell[2031, 52, 239, 6, 84, "Input",ExpressionUUID->"5cf901cf-beeb-441f-927b-cd5142bd01c6"],
+Cell[2273, 60, 181, 3, 35, "Text",ExpressionUUID->"ba5307e0-17ac-4a75-92f5-839bac671a5a"],
+Cell[2457, 65, 454, 7, 66, "Input",ExpressionUUID->"a5df4b8a-3929-41a7-833e-ea83b38fe7a4"],
+Cell[CellGroupData[{
+Cell[2936, 76, 113, 0, 54, "Subsection",ExpressionUUID->"19477219-f204-4eca-985f-a8cf3b916399"],
+Cell[3052, 78, 363, 5, 35, "Text",ExpressionUUID->"3ce7929c-4097-451c-8fa4-e8ff3cdafaa3"],
+Cell[3418, 85, 269, 6, 84, "Input",ExpressionUUID->"c0388270-d5df-408d-963f-e26c8de30f19"],
+Cell[3690, 93, 239, 4, 35, "Text",ExpressionUUID->"9f3c8e6b-de80-4db4-acd5-2ef72b1db95e"],
+Cell[3932, 99, 169, 2, 30, "Input",ExpressionUUID->"402811d3-aab1-4bd8-a681-313be8c77738"],
+Cell[4104, 103, 354, 5, 35, "Text",ExpressionUUID->"657477ab-2364-4270-95df-1802a7774e62"],
+Cell[4461, 110, 371, 7, 84, "Input",ExpressionUUID->"d33fa102-0355-496a-8e08-6bf2b9ecf9ca"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4869, 122, 178, 3, 54, "Subsection",ExpressionUUID->"875e3b5d-3c78-4761-a849-1367048208ac"],
+Cell[5050, 127, 407, 6, 40, "Text",ExpressionUUID->"a80d273b-2535-4f67-ab98-884e90700007"],
+Cell[CellGroupData[{
+Cell[5482, 137, 365, 7, 66, "Input",ExpressionUUID->"9f24f839-305f-440a-b746-7f7b1fb3af39"],
+Cell[5850, 146, 296, 6, 34, "Output",ExpressionUUID->"ba16f427-3c3e-4be2-89f3-4e1c6f719cf7"]
+}, Open  ]],
+Cell[6161, 155, 182, 3, 35, "Text",ExpressionUUID->"7bcd1330-4cea-49fe-9952-3342e60a72b2"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6392, 164, 90, 0, 67, "Section",ExpressionUUID->"dd28a654-2847-42ca-ab2b-0b9b4812218a"],
+Cell[6485, 166, 518, 7, 63, "Text",ExpressionUUID->"3c02aa8e-2de3-4384-9c3d-edc29f8a2c8f"],
+Cell[7006, 175, 481, 9, 84, "Input",ExpressionUUID->"b288c775-f8b5-4f7d-ba5b-54a8bcd6b0c3"],
+Cell[CellGroupData[{
+Cell[7512, 188, 118, 0, 54, "Subsection",ExpressionUUID->"5f77547f-00a9-49d1-b824-64d0e2900e08"],
+Cell[7633, 190, 177, 3, 35, "Text",ExpressionUUID->"087cf1f1-18f9-4a50-bcec-86f94b714076"],
+Cell[CellGroupData[{
+Cell[7835, 197, 528, 11, 102, "Input",ExpressionUUID->"f7ef8128-f515-4ce0-8e3c-782e3531362b"],
+Cell[8366, 210, 1487, 49, 149, "Output",ExpressionUUID->"69c62f4a-c1c2-4c65-9398-0b8bb4e08ec6"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9902, 265, 129, 0, 54, "Subsection",ExpressionUUID->"a8b09832-953b-4695-b45f-d116278daa82"],
+Cell[10034, 267, 161, 3, 35, "Text",ExpressionUUID->"d3bfc867-d0dd-4404-900b-93615361e355"],
+Cell[CellGroupData[{
+Cell[10220, 274, 612, 13, 120, "Input",ExpressionUUID->"c7a73675-4a03-46b0-abee-07da4d49f61f"],
+Cell[10835, 289, 1639, 55, 183, "Output",ExpressionUUID->"9737b2a0-3288-4033-884d-1574f4e94686"]
+}, Open  ]],
+Cell[12489, 347, 193, 3, 35, "Text",ExpressionUUID->"6c4e4cd7-7739-4b8d-af68-cc806a0f0289"],
+Cell[CellGroupData[{
+Cell[12707, 354, 317, 7, 84, "Input",ExpressionUUID->"cce9bf92-501b-47df-9263-17a988ba9696"],
+Cell[13027, 363, 630, 13, 34, "Output",ExpressionUUID->"3f921830-e569-4b46-81d7-5953e8e9a0a9"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13706, 382, 91, 0, 54, "Subsection",ExpressionUUID->"b97996c1-bd82-488c-8cce-b2372e8c91ee"],
+Cell[13800, 384, 303, 4, 35, "Text",ExpressionUUID->"1cd8960c-bf97-438e-b6c3-af7f791b03f8"],
+Cell[CellGroupData[{
+Cell[14128, 392, 482, 10, 102, "Input",ExpressionUUID->"0655d0b8-4142-4aaf-9dbe-596fd9cffdb5"],
+Cell[14613, 404, 1920, 53, 153, "Output",ExpressionUUID->"cbc46038-0e4e-46e0-9c13-b41ca8e61b5c"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16582, 463, 111, 0, 54, "Subsection",ExpressionUUID->"4559ce02-1fba-4b28-a516-a271d9b61f1a"],
+Cell[16696, 465, 364, 5, 40, "Text",ExpressionUUID->"d044a666-16de-4901-8221-98d63399808f"],
+Cell[CellGroupData[{
+Cell[17085, 474, 433, 8, 102, "Input",ExpressionUUID->"2063ed74-2f91-43a7-97dc-9e1f7edbba40"],
+Cell[17521, 484, 7679, 247, 331, "Output",ExpressionUUID->"3b6fc855-9e31-408a-934f-ee58dfde1eee"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+

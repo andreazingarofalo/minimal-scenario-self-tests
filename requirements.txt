@@ -1,0 +1,8 @@
+# Python 3.13. Versions used for the results of the paper.
+numpy==2.5.4
+scipy==1.18.1
+sympy==1.14.0
+matplotlib==3.11.2
+joblib==1.6.0
+ncpol2sdpa==1.14.0
+Mosek==11.2.6      # needs a licence (free for academic use)

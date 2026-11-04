@@ -1,0 +1,47 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+type: software
+title: 'Code for "All Bell inequalities with a quantum advantage in the minimal scenario are self-testing"'
+version: 1.0.0
+date-released: 2026-11-04
+license: MIT
+abstract: >-
+  Code for the paper "All Bell inequalities with a quantum advantage in the minimal scenario are self-testing".
+  The Mathematica notebooks derive the plane of candidate Bell functionals, prove the vertex table of the local
+  polygon exactly and verify the six sum-of-squares certificates exactly. The Python scripts compute the NPA
+  bounds of Table II and draw Figures 2, 3 and 4.
+keywords:
+  - Bell inequalities
+  - self-testing
+  - quantum correlations
+  - CHSH
+  - sum of squares
+  - NPA hierarchy
+authors:
+  - family-names: Liu
+    given-names: Mu-En
+    affiliation: "Université Paris-Saclay, CEA, CNRS, Institut de physique théorique"
+  - family-names: Zingarofalo
+    given-names: Andrea
+    orcid: "https://orcid.org/0009-0001-8018-8933"
+    affiliation: "Université Paris-Saclay, CEA, CNRS, Institut de physique théorique; Université libre de Bruxelles"
+  - family-names: Barizien
+    given-names: Victor
+    affiliation: "University of Geneva"
+  - family-names: Bancal
+    given-names: Jean-Daniel
+    affiliation: "Université Paris-Saclay, CEA, CNRS, Institut de physique théorique"
+preferred-citation:
+  type: article
+  title: "All Bell inequalities with a quantum advantage in the minimal scenario are self-testing"
+  status: preprint
+  year: 2026
+  authors:
+    - family-names: Liu
+      given-names: Mu-En
+    - family-names: Zingarofalo
+      given-names: Andrea
+    - family-names: Barizien
+      given-names: Victor
+    - family-names: Bancal
+      given-names: Jean-Daniel
